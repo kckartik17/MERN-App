@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
+const keys = require("../../config/keys");
 
 //@route GET api/users/test
 //@desc Tests users route
@@ -54,14 +56,23 @@ router.post("/login", async (req, res) => {
   const password = req.body.password;
 
   //Find user by email
-  const findUser = await User.findOne({ email });
-  if (!findUser) {
+  const foundUser = await User.findOne({ email });
+  if (!foundUser) {
     return res.status(404).json({ email: "User not found" });
   }
 
-  const isMatch = await bcrypt.compare(password, findUser.password);
+  const isMatch = await bcrypt.compare(password, foundUser.password);
   if (isMatch) {
-    res.json({ msg: "Success" });
+    //User Matched
+    const payload = {
+      id: foundUser.id,
+      name: foundUser.name,
+      avatar: foundUser.avatar
+    };
+    //Sign Token
+    jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
+      res.json({ success: true, token: "Bearer " + token });
+    });
   } else {
     res.status(400).json({ password: "Password Incorrect" });
   }
