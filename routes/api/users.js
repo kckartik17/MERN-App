@@ -7,6 +7,9 @@ const passport = require("passport");
 const User = require("../../models/User");
 const keys = require("../../config/keys");
 
+//Load input validation
+const validateRegisterInput = require("../../validation/register");
+
 //@route GET api/users/test
 //@desc Tests users route
 //@access Public
@@ -18,9 +21,16 @@ router.get("/test", (req, res) => res.json({ msg: "Users works" }));
 //@access Public
 
 router.post("/register", async (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+  //Check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
   const existingUser = await User.findOne({ email: req.body.email });
   if (existingUser) {
-    return res.status(400).json({ email: "Email already exists" });
+    errors.email = "Email already exists";
+    return res.status(400).json(errors);
   } else {
     const avatar = await gravatar.url(req.body.email, {
       s: "200",
