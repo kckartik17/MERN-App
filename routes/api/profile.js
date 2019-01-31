@@ -87,7 +87,7 @@ router.get("/handle/:handle", (req, res) => {
 });
 
 //@route GET api/profile/user/:user_id
-//@desc Get profile by user ID
+//@desc Get Profile by user ID
 //@access Public
 
 router.get("/user/:user_id", (req, res) => {
