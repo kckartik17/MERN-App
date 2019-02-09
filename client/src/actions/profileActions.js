@@ -8,6 +8,25 @@ import {
   GET_PROFILES
 } from "./types";
 
+//Get Profile by Handle
+export const getProfileByHandle = handle => dispatch => {
+  dispatch(setProfileLoading());
+  axios
+    .get(`/api/profile/handle/${handle}`)
+    .then(res =>
+      dispatch({
+        type: GET_PROFILE,
+        payload: res.data
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: GET_PROFILE,
+        payload: null
+      })
+    );
+};
+
 //Get current Profile
 export const getCurrentProfile = () => dispatch => {
   dispatch(setProfileLoading());
